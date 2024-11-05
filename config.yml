@@ -1,0 +1,17 @@
+path:
+  input_data_path: "data/raw/"
+  output_data_root: "data/processed/"
+  interim_data_root: "data/interim/"
+  models_root: "models"
+  logs_root: "logs"
+
+model:
+  name: "SVM"
+
+nn:
+  version: 1
+  epoch: 3
+  early_stopping_patience: 10
+
+svm:
+  C: 1.0
