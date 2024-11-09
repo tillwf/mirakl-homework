@@ -1,6 +1,8 @@
 import click
 import logging
 import pandas as pd
+import pickle
+
 from sklearn.model_selection import train_test_split
 from pathlib import Path
 
@@ -74,6 +76,11 @@ def make_dataset(train_eval_ratio):
     test_path = output_root / "test.parquet"
     df_test.to_parquet(test_path, index=False)
     
+    # Mapping
+    logging.info("\tMapping")
+    with open(output_root / "category_mapping.pickle", 'wb') as file:
+        pickle.dump(uniques, file)
+
     # Sanity Check
     train_users = pd.read_parquet(train_path)
     logging.info(f"train size: {len(train_users)} ({train_users.category_id.nunique()} distinct category)")

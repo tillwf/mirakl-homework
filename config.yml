@@ -10,8 +10,8 @@ model:
 
 nn:
   version: 1
-  epoch: 3
-  early_stopping_patience: 10
+  epoch: 50
+  early_stopping_patience: 5
 
 svm:
   C: 1.0

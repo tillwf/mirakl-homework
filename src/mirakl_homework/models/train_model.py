@@ -5,6 +5,7 @@ from mirakl_homework.config import load_config
 from mirakl_homework.utils import load_datasets
 from mirakl_homework.models.neural_network import NeuralNetwork
 from mirakl_homework.models.support_vector_machine import SupportVectorMachine
+from mirakl_homework.models.utils import result_analysis
 
 CONF = load_config()
 MODEL_NAME = CONF["model"]["name"]
@@ -46,3 +47,7 @@ def train_model(model_name):
 
     model.fit(X_train, y_train, X_validation, y_validation, feature_cols)
     model.save()
+
+    print("Predicting on validation set")
+    raw_predictions = model.predict(X_validation, feature_cols)
+    result_analysis(y_validation, raw_predictions)

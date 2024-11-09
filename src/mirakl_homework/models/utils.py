@@ -1,3 +1,6 @@
+from sklearn.metrics import accuracy_score
+
+
 def dataframe_to_dict(df, features_cols):
     return {col: df[col].values for col in features_cols}
 
@@ -25,3 +28,7 @@ def get_ancestors(graph, node):
     # Return the ancestors in the order from root to the direct parent
     # return [np.int64(0) if ancestor == new_root_id else uniques[ancestor] for ancestor in ancestors]
     return ancestors
+
+
+def result_analysis(y_true, y_pred):
+    print(f"{accuracy_score(y_true, y_pred):.2%} of global accuracy")

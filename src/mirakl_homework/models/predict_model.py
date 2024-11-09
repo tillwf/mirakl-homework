@@ -1,11 +1,14 @@
 import click
 import logging
 import os
+import pickle
 
-from sklearn.metrics import accuracy_score
+from pathlib import Path
 
 from mirakl_homework.config import load_config
 from mirakl_homework.utils import load_datasets
+from mirakl_homework.models.utils import result_analysis
+
 from .support_vector_machine import SupportVectorMachine
 from .neural_network import NeuralNetwork
 
@@ -53,8 +56,17 @@ def make_predictions(model_name):
 
     # Add columns to compute the metrics (Mean Rank, MAP@10, etc.)
     X_test["predictions"] = raw_predictions
-    print(f"{accuracy_score(y_test, raw_predictions):.2%}")
+
+    result_analysis(y_test, raw_predictions)
 
     # Saving the predictions
     logging.info("Saving predictions")
-    X_test.to_csv(os.path.join(OUTPUT_ROOT, "raw_predictions.csv"))
+    # Add the conversion step
+
+    output_root = Path(OUTPUT_ROOT)
+    with open(output_root / "category_mapping.pickle", 'rb') as file:
+        uniques = pickle.load(file)
+    X_test['final_predictions'] = X_test['predictions'].apply(
+        lambda x: uniques[x]
+    )
+    X_test[["product_id", "final_predictions"]].to_csv(os.path.join(OUTPUT_ROOT, "raw_predictions.csv"))
