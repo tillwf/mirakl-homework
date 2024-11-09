@@ -35,7 +35,7 @@ def make_predictions(model_name):
     logging.info("Make Prediction")
 
     logging.info("Reading test data")
-    _, _, X_test = load_datasets()
+    _, X_test, _ = load_datasets()
     y_test = X_test.pop("category_id")
 
     # Merge the "user based" features
@@ -56,12 +56,10 @@ def make_predictions(model_name):
 
     # Add columns to compute the metrics (Mean Rank, MAP@10, etc.)
     X_test["predictions"] = raw_predictions
-
     result_analysis(y_test, raw_predictions)
 
     # Saving the predictions
     logging.info("Saving predictions")
-    # Add the conversion step
 
     output_root = Path(OUTPUT_ROOT)
     with open(output_root / "category_mapping.pickle", 'rb') as file:
@@ -69,4 +67,6 @@ def make_predictions(model_name):
     X_test['final_predictions'] = X_test['predictions'].apply(
         lambda x: uniques[x]
     )
-    X_test[["product_id", "final_predictions"]].to_csv(os.path.join(OUTPUT_ROOT, "raw_predictions.csv"))
+    X_test[["product_id", "final_predictions"]].to_csv(
+        os.path.join(OUTPUT_ROOT, f"raw_predictions_{MODEL_NAME}.csv")
+    )

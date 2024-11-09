@@ -6,11 +6,11 @@ path:
   logs_root: "logs"
 
 model:
-  name: "SVM"
+  name: "NN"
 
 nn:
   version: 1
-  epoch: 50
+  epoch: 5
   early_stopping_patience: 5
 
 svm:

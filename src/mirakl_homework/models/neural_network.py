@@ -2,14 +2,12 @@ import os
 import tensorflow as tf
 import numpy as np
 
-from tensorflow.keras.layers import Input, Dense, Dropout, Concatenate
-from tensorflow.keras.layers import Normalization
+from tensorflow.keras.layers import Input, Dense, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.models import load_model
 
 from .classifier import Classifier
 from mirakl_homework.config import load_config
-from mirakl_homework.models.utils import dataframe_to_dict
 
 CONF = load_config()
 EPSILON = tf.keras.backend.epsilon()
@@ -22,119 +20,98 @@ LOGS_ROOT = CONF["path"]["logs_root"]
 
 class NeuralNetwork(Classifier):
     def __init__(self, feature_cols, n_categories):
-        # Simulate fitting process
+        self.feature_cols = feature_cols
+        self.n_categories = n_categories
+
         print("Training Neural Network with 3 layers.")
-        # Replace with actual neural network training code
+        self.model = self.build_model()
+        self.callbacks = self.create_callbacks()
+        self.model.summary()
 
-        inputs = []
-        encoded_features = []
-
+    def build_model(self):
         l2_weight = 10 ** -5
 
-        # Normalize numerical features
-        for col in feature_cols:
-            numeric_input = Input(shape=(1,), name=col)
-            normalization_layer = Normalization()(numeric_input)
-            inputs.append(numeric_input)
-            encoded_features.append(normalization_layer)
-
-        all_features = Concatenate()(encoded_features)
-
-        # Define the rest of the model
-        x = Dense(64, activation='relu')(all_features)
+        inputs = Input(shape=(len(self.feature_cols),), name="feature_input")
+        x = Dropout(0.2)(inputs)
+        x = Dense(64, activation='relu')(x)
         x = Dropout(0.2)(x)
         x = Dense(32, activation='relu')(x)
         x = Dropout(0.2)(x)
         x = Dense(16, activation='relu')(x)
         output = Dense(
-            n_categories,
+            self.n_categories,
             activation='softmax',
             kernel_regularizer=tf.keras.regularizers.l2(l2_weight),
-            name="category"
+            name="output_layer"
         )(x)
 
-        # Create the model
-        self.model = Model(inputs=inputs, outputs=output)
+        model = Model(inputs=inputs, outputs=output)
 
-        # Compile the model
-        self.model.compile(
+        model.compile(
             optimizer=tf.keras.optimizers.Adam(),
             loss='sparse_categorical_crossentropy',
             metrics=['accuracy']
         )
 
-        # Model summary
-        self.model.summary()
+        model.summary()
+        return model
 
+    def create_callbacks(self):
         # Add callbacks to be able to restart if a process fail, to
         # save the best model and to create a TensorBoard
-        self.callbacks = []
-
         os.makedirs(MODELS_ROOT, exist_ok=True)
         os.makedirs(LOGS_ROOT, exist_ok=True)
+
         tensorboard = tf.keras.callbacks.TensorBoard(
             log_dir=LOGS_ROOT,
             histogram_freq=1,
-            write_graph=True,
-            write_images=False,
-            update_freq=100,
-            profile_batch=2,
-            embeddings_freq=1
+            update_freq='epoch'
         )
-        self.callbacks.append(tensorboard)
-
-        self.best_model_file = os.path.join(MODELS_ROOT, "best_model_so_far")
         best_model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
-            self.best_model_file,
+            os.path.join(MODELS_ROOT, "best_model.h5"),
             monitor='val_loss',
-            verbose=1,
-            save_best_only=True
+            save_best_only=True,
+            verbose=1
         )
-        self.callbacks.append(best_model_checkpoint)
-
         early_stopping = tf.keras.callbacks.EarlyStopping(
+            monitor="val_loss",
             patience=PATIENCE,
-            monitor="val_loss"
+            restore_best_weights=True
         )
-        self.callbacks.append(early_stopping)
+
+        return [tensorboard, best_model_checkpoint, early_stopping]
 
     def fit(self, X_train, y_train, X_validation, y_validation, feature_cols):
-
-        # Prepare data for training (convert X_train to dictionary)
-        X_train_dict = dataframe_to_dict(X_train, feature_cols)
-        X_validation_dict = dataframe_to_dict(X_validation, feature_cols)
-
         # Launch the train and save the loss evolution in `history`
         history = self.model.fit(
-            X_train_dict,
+            X_train[feature_cols],
             y_train.values,
             callbacks=self.callbacks,
             epochs=EPOCH,
             validation_data=(
-                X_validation_dict,
+                X_validation[feature_cols],
                 y_validation.values
             )
         )
-
-        # Save the model
-        self.model.load_weights(self.best_model_file)
+        return history
 
     def predict(self, X_test, feature_cols):
         if not self.model:
             raise Exception("Model is not trained yet.")
-        # Simulate prediction
-        print("Predicting with Neural Network.")
-        X_test_dict = dataframe_to_dict(X_test, feature_cols)
 
-        print("Making predictions")
-        raw_predictions = self.model.predict(X_test_dict)
+        print("Predicting with Neural Network.")
+        raw_predictions = self.model.predict(X_test[feature_cols])
         return np.argmax(raw_predictions, axis=1)
 
-    def save(self):
-        self.model.save(os.path.join(MODELS_ROOT, "final_model"))
+    def save(self, filename="final_model.h5"):
+        save_path = os.path.join(MODELS_ROOT, filename)
+        self.model.save(save_path)
+        print(f"Model saved to {save_path}")
 
-    def load(self):
-        model = load_model(
-            os.path.join(MODELS_ROOT, "final_model")
-        )
-        return model
+    def load(self, filename="final_model.h5"):
+        load_path = os.path.join(MODELS_ROOT, filename)
+        if not os.path.exists(load_path):
+            raise FileNotFoundError(f"Model file {load_path} not found.")
+        self.model = load_model(load_path)
+        print(f"Model loaded from {load_path}")
+        return self.model

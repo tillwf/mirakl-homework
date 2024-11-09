@@ -1,8 +1,8 @@
+import numpy as np
+import pandas as pd
+
 from sklearn.metrics import accuracy_score
-
-
-def dataframe_to_dict(df, features_cols):
-    return {col: df[col].values for col in features_cols}
+from sklearn.metrics import precision_score
 
 
 def get_ancestors(graph, node):
@@ -31,4 +31,41 @@ def get_ancestors(graph, node):
 
 
 def result_analysis(y_true, y_pred):
-    print(f"{accuracy_score(y_true, y_pred):.2%} of global accuracy")
+    global_accuracy = accuracy_score(y_true, y_pred)
+    global_precision = precision_score(
+        y_true,
+        y_pred,
+        average='macro',
+        zero_division=0
+    )
+    weighted_global_precision = precision_score(
+        y_true,
+        y_pred,
+        average='weighted',
+        zero_division=0
+    )
+
+    print(f"{global_accuracy:.2%} of global accuracy")
+    print(f"{global_precision:.2%} of global precision")
+    print(f"{weighted_global_precision:.2%} of weighted global precision")
+
+    precision_per_class = precision_score(
+        y_true,
+        y_pred,
+        average=None,
+        zero_division=0
+    )
+    class_counts = pd.Series(y_true).value_counts().sort_index()
+
+    best_class_idx = np.argmax(precision_per_class)
+    worst_class_idx = np.argmin(precision_per_class)
+
+    # Extract the best and worst classes' names, precision values, and counts
+    best_class_precision = precision_per_class[best_class_idx]
+    worst_class_precision = precision_per_class[worst_class_idx]
+
+    best_class_count = class_counts[best_class_idx]
+    worst_class_count = class_counts[worst_class_idx]
+
+    print(f"Best classified category: Class {best_class_idx}, Precision: {best_class_precision:.2%}, Number of elements: {best_class_count}")
+    print(f"Worst classified category: Class {worst_class_idx}, Precision: {worst_class_precision:.2%}, Number of elements: {worst_class_count}")
