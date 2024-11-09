@@ -1,4 +1,5 @@
 import joblib
+import logging
 
 from pathlib import Path
 from sklearn import svm
@@ -21,16 +22,16 @@ class SupportVectorMachine(Classifier):
 
     def fit(self, X_train, y_train, X_validation, y_validation, feature_cols):
         # Simulate fitting process
-        print(f"Training Support Vector Machine with kernel='linear' and C={self.C}.")
+        logging.info(f"Training Support Vector Machine with kernel='linear' and C={self.C}.")
         self.model.fit(X_train[feature_cols], y_train)
         y_pred = self.model.predict(X_validation[feature_cols])
-        print(f"{accuracy_score(y_validation, y_pred)}:.2%")
+        logging.info(f"{accuracy_score(y_validation, y_pred)}:.2%")
 
     def predict(self, X_test, feature_cols):
         if not self.model:
             raise Exception("Model is not trained yet.")
         # Simulate prediction
-        print("Predicting with Support Vector Machine.")
+        logging.info("Predicting with Support Vector Machine.")
         return self.model.predict(X_test[feature_cols])
 
     def save(self):

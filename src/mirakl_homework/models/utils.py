@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import pandas as pd
 
@@ -59,11 +60,11 @@ def result_analysis(y_true, y_pred):
         zero_division=0
     )
 
-    print(f"{global_accuracy:.2%} of global accuracy")
-    print(f"{global_precision:.2%} of global precision")
-    print(f"{weighted_global_precision:.2%} of weighted global precision")
-    print(f"{global_recall:.2%} of global recall")
-    print(f"{weighted_global_recall:.2%} of weighted global recall")
+    logging.info(f"{global_accuracy:.2%} of global accuracy")
+    logging.info(f"{global_precision:.2%} of global precision")
+    logging.info(f"{weighted_global_precision:.2%} of weighted global precision")
+    logging.info(f"{global_recall:.2%} of global recall")
+    logging.info(f"{weighted_global_recall:.2%} of weighted global recall")
 
     precision_per_class = precision_score(
         y_true,
@@ -94,5 +95,5 @@ def result_analysis(y_true, y_pred):
     worst_class_count = class_counts[worst_class_idx]
 
     # Print best and worst class details
-    print(f"Best classified category: Class {best_class_idx}, Precision: {best_class_precision:.2%}, Recall: {best_class_recall:.2%}, Number of elements: {best_class_count}")
-    print(f"Worst classified category: Class {worst_class_idx}, Precision: {worst_class_precision:.2%}, Recall: {worst_class_recall:.2%}, Number of elements: {worst_class_count}")
+    logging.info(f"Best classified category: Class {best_class_idx}, Precision: {best_class_precision:.2%}, Recall: {best_class_recall:.2%}, Number of elements: {best_class_count}")
+    logging.info(f"Worst classified category: Class {worst_class_idx}, Precision: {worst_class_precision:.2%}, Recall: {worst_class_recall:.2%}, Number of elements: {worst_class_count}")

@@ -49,7 +49,7 @@ def make_predictions(model_name):
         model = NeuralNetwork(feature_cols, y_test.nunique())
         model.load()
     else:
-        print(f"No model named {model_name}")
+        logging.info(f"No model named {model_name}")
         return
 
     raw_predictions = model.predict(X_test, feature_cols)

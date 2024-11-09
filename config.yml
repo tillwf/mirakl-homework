@@ -6,7 +6,7 @@ path:
   logs_root: "logs"
 
 model:
-  name: "NN"
+  name: "SVM"
 
 nn:
   version: 1

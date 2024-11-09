@@ -35,19 +35,19 @@ def train_model(model_name):
     # Select feature columns
     feature_cols = [f"f{i}" for i in range(128)]
 
-    if model_name == "NN":
-        print("NN")
+    if model_name.upper() == "NN":
+        logging.info("NN")
         model = NeuralNetwork(feature_cols, y_train.nunique())
-    elif model_name == "SVM":
-        print("SVM")
+    elif model_name.upper() == "SVM":
+        logging.info("SVM")
         model = SupportVectorMachine()
     else:
-        print("Model not implemented")
+        logging.info("Model not implemented")
         return
 
     model.fit(X_train, y_train, X_validation, y_validation, feature_cols)
     model.save()
 
-    print("Predicting on validation set")
+    logging.info("Predicting on validation set")
     raw_predictions = model.predict(X_validation, feature_cols)
     result_analysis(y_validation, raw_predictions)

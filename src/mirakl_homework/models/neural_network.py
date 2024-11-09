@@ -1,3 +1,4 @@
+import logging
 import os
 import tensorflow as tf
 import numpy as np
@@ -23,7 +24,7 @@ class NeuralNetwork(Classifier):
         self.feature_cols = feature_cols
         self.n_categories = n_categories
 
-        print("Training Neural Network with 3 layers.")
+        logging.info("Training Neural Network with 3 layers.")
         self.model = self.build_model()
         self.callbacks = self.create_callbacks()
         self.model.summary()
@@ -99,19 +100,19 @@ class NeuralNetwork(Classifier):
         if not self.model:
             raise Exception("Model is not trained yet.")
 
-        print("Predicting with Neural Network.")
+        logging.info("Predicting with Neural Network.")
         raw_predictions = self.model.predict(X_test[feature_cols])
         return np.argmax(raw_predictions, axis=1)
 
     def save(self, filename="final_model.h5"):
         save_path = os.path.join(MODELS_ROOT, filename)
         self.model.save(save_path)
-        print(f"Model saved to {save_path}")
+        logging.info(f"Model saved to {save_path}")
 
     def load(self, filename="final_model.h5"):
         load_path = os.path.join(MODELS_ROOT, filename)
         if not os.path.exists(load_path):
             raise FileNotFoundError(f"Model file {load_path} not found.")
         self.model = load_model(load_path)
-        print(f"Model loaded from {load_path}")
+        logging.info(f"Model loaded from {load_path}")
         return self.model
