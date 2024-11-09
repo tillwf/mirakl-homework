@@ -4,7 +4,7 @@
 
 - **Train Set:** 241,483 articles (20%, or 48,297 articles, will be used as a validation set)
 - **Test Set:** 44,738 articles
-- **Features:** 128
+- **Features:** 127
 - **Categories:** 101 unique categories in both the training and test sets, indicating no category discrepancies.
 
 ![image](https://github.com/user-attachments/assets/b6021b11-45ed-48b5-afce-665f1165166f)
