@@ -1,5 +1,7 @@
 # Mirakl
 
+Data Exploration and Experimentations in the [notebooks folder](notebooks/)
+
 ## Installation
 
 To get started, set up your virtual environment using `pyenv` ([pyenv installer](https://github.com/pyenv/pyenv-installer))

@@ -104,6 +104,50 @@ Best classified category: Class 98, Precision: 100.00%, Recall: 6.34%, Number of
 Worst classified category: Class 2, Precision: 0.00%, Recall: 0.00%, Number of elements: 310
 ```
 
+### Other algorithm
+
+Using the lazypredict package, we were able to quickly run a variety of algorithms and analyze their performance. The results indicate that LinearSVC achieves one of the highest accuracy scores while maintaining a reasonable execution time.
+
+```python
+from lazypredict.Supervised import LazyClassifier
+clf = LazyClassifier(verbose=0, ignore_warnings=True, custom_metric=None)
+models, predictions = clf.fit(
+    X_train[FEATURE_COLS],
+    X_test[FEATURE_COLS],
+    y_train,
+    y_test
+)
+
+print(models)
+```
+
+|                               | Accuracy | Balanced Accuracy | Time_Taken | F1_Score |
+|-------------------------------|----------|-------------------|------------|----------|
+| SVC                           | 0.68     | 0.67              | 1805.43    | 0.67     |
+| LinearSVC                     | 0.67     | 0.65              | 110.59     | 0.65     |
+| CalibratedClassifierCV        | 0.67     | 0.65              | 501.99     | 0.66     |
+| NearestCentroid               | 0.62     | 0.64              | 1.34       | 0.62     |
+| LinearDiscriminantAnalysis    | 0.63     | 0.64              | 4.50       | 0.63     |
+| LogisticRegression            | 0.65     | 0.64              | 88.22      | 0.65     |
+| BernoulliNB                   | 0.60     | 0.61              | 1.42       | 0.60     |
+| KNeighborsClassifier          | 0.61     | 0.60              | 18.97      | 0.60     |
+| RandomForestClassifier        | 0.63     | 0.59              | 373.55     | 0.62     |
+| QuadraticDiscriminantAnalysis | 0.60     | 0.59              | 14.42      | 0.60     |
+| GaussianNB                    | 0.58     | 0.59              | 4.53       | 0.58     |
+| ExtraTreesClassifier          | 0.62     | 0.59              | 65.76      | 0.61     |
+| Perceptron                    | 0.53     | 0.51              | 24.84      | 0.52     |
+| PassiveAggressiveClassifier   | 0.52     | 0.51              | 31.69      | 0.51     |
+| BaggingClassifier             | 0.53     | 0.49              | 465.33     | 0.53     |
+| RidgeClassifier               | 0.58     | 0.49              | 1.15       | 0.53     |
+| RidgeClassifierCV             | 0.58     | 0.49              | 3.40       | 0.53     |
+| SGDClassifier                 | 0.55     | 0.48              | 253.01     | 0.56     |
+| DecisionTreeClassifier        | 0.43     | 0.39              | 69.87      | 0.43     |
+| ExtraTreeClassifier           | 0.31     | 0.29              | 1.25       | 0.31     |
+| AdaBoostClassifier            | 0.31     | 0.24              | 232.91     | 0.29     |
+| LGBMClassifier                | 0.13     | 0.11              | 75.68      | 0.12     |
+| DummyClassifier               | 0.04     | 0.01              | 0.52       | 0.00     |
+
+
 ### Summary and Insights
 
 Across models, accuracy, precision, and weighted precision were similar, indicating minimal impact from class imbalance. The SVM model generally outperformed the neural network, with no classes left entirely unclassified (lowest precision was 44%). The neural network struggled with certain classes, showing 0% precision in some cases.
